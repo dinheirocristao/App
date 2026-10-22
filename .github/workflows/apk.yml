@@ -1,0 +1,32 @@
+name: Compilar APK
+on: [push, workflow_dispatch]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - name: Localizar projeto
+        run: |
+          if [ -z "$(find . -name settings.gradle.kts -not -path './.git/*' | head -1)" ] && [ -f AutoTdah.zip ]; then unzip -o AutoTdah.zip; fi
+          F=$(find . -name settings.gradle.kts -not -path './.git/*' | head -1)
+          if [ -z "$F" ]; then echo "settings.gradle.kts não encontrado"; find . -maxdepth 3 -not -path './.git*'; exit 1; fi
+          echo "PROJ=$(dirname "$F")" >> $GITHUB_ENV
+          echo "Projeto em: $(dirname "$F")"
+      - name: Testes e APK
+        run: cd "$PROJ" && gradle --no-daemon testDebugUnitTest assembleDebug
+      - name: Publicar APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp "$PROJ"/app/build/outputs/apk/debug/app-debug.apk AutoTdah.apk
+          gh release delete ultima-versao --yes --cleanup-tag || true
+          gh release create ultima-versao AutoTdah.apk --target "$GITHUB_SHA" --title "AutoTdah – versão de teste" --notes "Gerado automaticamente" --prerelease
