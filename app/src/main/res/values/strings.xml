@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AutoTdah</string>
+    <string name="accessibility_label">AutoTdah – bloqueio por etapas</string>
+    <string name="accessibility_description">O AutoTdah usa a acessibilidade apenas para saber qual aplicativo foi aberto e mostrar a tela de bloqueio quando ele não estiver liberado na etapa atual da sua programação. Não lê textos, mensagens ou senhas, não captura a tela e não envia dados para a internet. Você pode desativar este serviço a qualquer momento.</string>
+</resources>
